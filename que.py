@@ -42,22 +42,6 @@ class Monomial(object):
     def __repr__(self):
         return str(self)
 
-    def apply_rule(self, before, scalar, after):
-        new_monomial = []
-
-        for i in range(len(self.monomial)-1):
-            e1 = self.monomial[i]
-            e2 = self.monomial[i+1]
-            if e1 == before[0] and e2 == before[1]:
-                new_monomial += after
-                return True, Monomial(self.scalar * scalar,
-                                      new_monomial + self.monomial[i+2:],
-                                      self.power)
-            else:
-                new_monomial += [self.monomial[i]]
-
-        return False, Monomial(self.scalar, self.monomial, self.power)
-
 class Polynomial(object):
     def __init__(self, monomials):
         self.monomials = monomials
