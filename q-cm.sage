@@ -13,6 +13,8 @@ K2inv = Monomial(1, ['K2inv'])
 
 c1, c2, d1, d2 = var('c1 c2 d1 d2')
 
+l = var('l')
+
 # B1c = F1 - c1 * E2*K1inv
 # B2c = F2 - c2 * E1*K2inv
 # B1d = F1 - d1 * E2*K1inv
@@ -20,12 +22,13 @@ c1, c2, d1, d2 = var('c1 c2 d1 d2')
 
 # right coideal generators
 K = Monomial(1, ['K'])
-Kl = Monomial(1, ['K_{l}'])
 B1c = Monomial(1, ['B1c'])
 B2c = Monomial(1, ['B2c'])
 B1d = Monomial(1, ['B1d'])
 B2d = Monomial(1, ['B2d'])
 
+Kl = Monomial(1, ['K'], l)
+print(Kl)
 X = Polynomial([Kl*F1])
 
 print(X)
@@ -57,9 +60,38 @@ def step1(P):
     return ret
 
 def step2(P):
-    return P
-    
+    ret = None
 
+    for M in P:
+        scalar = M.scalar
+        monomial = M.monomial
+
+        newt = None
+        if len(monomial) > 2:
+            if monomial[-1] == 'K1inv' and monomial[-2] == 'E2':
+                for i in range(len(monomial)-3, -1, -1):
+                    if monomial[i] == 'K_{l}':
+                        power = monomial[i].split('_')[1][1:-1]
+                        print(power)
+                        # K_{l} * E2*K1inv = q^{l} * E2*K1inv * K_{l}
+                newt = M
+
+            if monomial[-1] == 'K2inv' and monomial[-2] == 'E1':
+                newt = M
+
+            else:
+                newt = M
+        else:
+            newt = M
+
+        if ret:
+            ret += newt
+        else:
+            ret = newt
+
+    return ret
+ 
 S1 = step1(X)
 print(S1)
-S2 = step2(S1)
+#S2 = step2(S1)
+#print(S2)

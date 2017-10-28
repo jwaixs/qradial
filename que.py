@@ -1,29 +1,44 @@
 class Monomial(object):
-    def __init__(self, scalar, monomial):
+    def __init__(self, scalar, monomial, power=1):
         self.scalar = scalar
         self.monomial = monomial
+        self.power = power
 
     def __mul__(self, other):
         if type(other) in (int, float):
-            return Monomial(other * self.scalar, self.monomial)
+            return Monomial(other * self.scalar, self.monomial, self.power)
         elif type(other) == Monomial:
-            return Monomial(self.scalar * other.scalar, self.monomial + other.monomial)
+            if self.power != 1 or other.power != 1:
+                return Polynomial([self, other])
+            else:
+                return Monomial(self.scalar * other.scalar,
+                            self.monomial + other.monomial,
+                            self.power)
         elif type(other) == Polynomial:
             return Polynomial([self * m for m in other.monomials])
         else:
             raise TypeError('Cannot multiply this type.')
 
     def __rmul__(self, other):
-        return Monomial(other * self.scalar, self.monomial)
+        return Monomial(other * self.scalar, self.monomial, self.power + other.power)
 
     def __add__(self, other):
         return Polynomial([self, other])
 
+    def __pow__(self, power):
+        return Monomial(self.scalar, self.monomial, self.power * power)
+
     def __str__(self):
         if self.scalar == 1:
-            return '*'.join(self.monomial)
+            if self.power != 1:
+                return '{}^{}'.format('*'.join(self.monomial), self.power)
+            else:
+                return '*'.join(self.monomial)
         else:
-            return '{}*{}'.format(self.scalar, '*'.join(self.monomial))
+            if self.power != 1:
+                return '{}*{}^{}'.format(self.scalar, '*'.join(self.monomial), self.power)
+            else:
+                return '{}*{}'.format(self.scalar, '*'.join(self.monomial))
 
     def __repr__(self):
         return str(self)
@@ -36,11 +51,13 @@ class Monomial(object):
             e2 = self.monomial[i+1]
             if e1 == before[0] and e2 == before[1]:
                 new_monomial += after
-                return True, Monomial(self.scalar * scalar, new_monomial + self.monomial[i+2:])
+                return True, Monomial(self.scalar * scalar,
+                                      new_monomial + self.monomial[i+2:],
+                                      self.power)
             else:
                 new_monomial += [self.monomial[i]]
 
-        return False, Monomial(self.scalar, self.monomial)
+        return False, Monomial(self.scalar, self.monomial, self.power)
 
 class Polynomial(object):
     def __init__(self, monomials):
@@ -146,3 +163,5 @@ F1 = Monomial(1, ['F1'])
 F2 = Monomial(1, ['F2'])
 K1 = Monomial(1, ['K1'])
 K2 = Monomial(1, ['K2'])
+
+print(E1**2*E2)
