@@ -42,6 +42,23 @@ class Monomial(object):
     def __repr__(self):
         return str(self)
 
+    def simplify(self):
+        try:
+            scalar = self.scalar.simplify()
+        except AttributeError:
+            scalar = self.scalar
+        monomial = list()
+        power = list()
+
+        for m, p in zip(self.monomial, self.power):
+            if len(monomial) > 0 and m == monomial[-1]:
+                power[-1] += p
+            else:
+                monomial.append(m)
+                power.append(p)
+
+        return Monomial(scalar, monomial, power)
+
 class Polynomial(object):
     def __init__(self, monomials):
         self.monomials = monomials
@@ -86,6 +103,7 @@ class Polynomial(object):
     def simplify(self):
         new_monomials = list()
         for m in self.monomials:
+            m = m.simplify()
             new_monomial = True
             for i, n in enumerate(new_monomials):
                 if m.monomial == n.monomial:
@@ -147,4 +165,6 @@ F2 = Monomial(1, ['F2'])
 K1 = Monomial(1, ['K1'])
 K2 = Monomial(1, ['K2'])
 
-print(E1**2*E2*E2)
+X = E1**2*E2*E2
+print(X)
+print(X.simplify())
