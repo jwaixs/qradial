@@ -1,5 +1,5 @@
 class Monomial(object):
-    def __init__(self, scalar, monomial, power=1):
+    def __init__(self, scalar, monomial, power=[1]):
         self.scalar = scalar
         self.monomial = monomial
         self.power = power
@@ -8,12 +8,9 @@ class Monomial(object):
         if type(other) in (int, float):
             return Monomial(other * self.scalar, self.monomial, self.power)
         elif type(other) == Monomial:
-            if self.power != 1 or other.power != 1:
-                return Polynomial([self, other])
-            else:
-                return Monomial(self.scalar * other.scalar,
+            return Monomial(self.scalar * other.scalar,
                             self.monomial + other.monomial,
-                            self.power)
+                            self.power + other.power)
         elif type(other) == Polynomial:
             return Polynomial([self * m for m in other.monomials])
         else:
@@ -26,19 +23,21 @@ class Monomial(object):
         return Polynomial([self, other])
 
     def __pow__(self, power):
-        return Monomial(self.scalar, self.monomial, self.power * power)
+        return Monomial(self.scalar, self.monomial, [power * p for p in self.power])
 
     def __str__(self):
-        if self.scalar == 1:
-            if self.power != 1:
-                return '{}^{}'.format('*'.join(self.monomial), self.power)
+        ret = ""
+
+        if self.scalar != 1:
+            ret += self.scalar + '*'
+
+        for m, p in zip(self.monomial, self.power):
+            if p != 1:
+                ret += '{}^({})*'.format(m, p)
             else:
-                return '*'.join(self.monomial)
-        else:
-            if self.power != 1:
-                return '{}*{}^{}'.format(self.scalar, '*'.join(self.monomial), self.power)
-            else:
-                return '{}*{}'.format(self.scalar, '*'.join(self.monomial))
+                ret += '{}*'.format(m)
+
+        return ret[:-1]
 
     def __repr__(self):
         return str(self)
@@ -164,4 +163,4 @@ F2 = Monomial(1, ['F2'])
 K1 = Monomial(1, ['K1'])
 K2 = Monomial(1, ['K2'])
 
-print(E1**2*E2)
+print(E1**2*E2*E2)
