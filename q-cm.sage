@@ -8,8 +8,8 @@ F1 = Monomial(1, ['F1'])
 F2 = Monomial(1, ['F2'])
 K1 = Monomial(1, ['K1'])
 K2 = Monomial(1, ['K2'])
-K1inv = Monomial(1, ['K1inv'])
-K2inv = Monomial(1, ['K2inv'])
+K1inv = Monomial(1, ['K1'], [-1])
+K2inv = Monomial(1, ['K2'], [-1])
 
 c1, c2, d1, d2 = var('c1 c2 d1 d2')
 
@@ -27,7 +27,7 @@ B2c = Monomial(1, ['B2c'])
 B1d = Monomial(1, ['B1d'])
 B2d = Monomial(1, ['B2d'])
 
-Kl = Monomial(1, ['K'], l)
+Kl = Monomial(1, ['K'], [l])
 print(Kl)
 X = Polynomial([Kl*F1])
 
@@ -65,22 +65,25 @@ def step2(P):
     for M in P:
         scalar = M.scalar
         monomial = M.monomial
+        power = M.power
 
         newt = None
         if len(monomial) > 2:
-            if monomial[-1] == 'K1inv' and monomial[-2] == 'E2':
+            if monomial[-1] == 'K1' and power[-1] == -1 \
+                and monomial[-2] == 'E2' and power[-2] == 1:
+                # K^l F_{i_1} F_{i_2} ... F_{i_{n-1}} E_j K_j^{-1}
+                # |-->
+                # E_j K_j^{-1} K^l F_{i_1} F_{i_2} ... F_{i_{n-1}} + ...rest terms...
+
+                continue
+                # I dont know how to do it yet.
+
+                main = M
+                rest = None
+
                 for i in range(len(monomial)-3, -1, -1):
-                    if monomial[i] == 'K_{l}':
-                        power = monomial[i].split('_')[1][1:-1]
-                        print(power)
-                        # K_{l} * E2*K1inv = q^{l} * E2*K1inv * K_{l}
-                newt = M
-
-            if monomial[-1] == 'K2inv' and monomial[-2] == 'E1':
-                newt = M
-
-            else:
-                newt = M
+                    print(monomial[i])
+            
         else:
             newt = M
 
@@ -93,5 +96,5 @@ def step2(P):
  
 S1 = step1(X)
 print(S1)
-#S2 = step2(S1)
+S2 = step2(S1)
 #print(S2)

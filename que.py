@@ -1,8 +1,11 @@
 class Monomial(object):
-    def __init__(self, scalar, monomial, power=[1]):
+    def __init__(self, scalar, monomial, power=None):
         self.scalar = scalar
         self.monomial = monomial
-        self.power = power
+        if power:
+            self.power = power
+        else:
+            self.power = len(monomial)*[1]
 
     def __mul__(self, other):
         if type(other) in (int, float):
@@ -17,7 +20,7 @@ class Monomial(object):
             raise TypeError('Cannot multiply this type.')
 
     def __rmul__(self, other):
-        return Monomial(other * self.scalar, self.monomial, self.power + other.power)
+        return Monomial(other * self.scalar, self.monomial, self.power)
 
     def __add__(self, other):
         return Polynomial([self, other])
@@ -29,7 +32,7 @@ class Monomial(object):
         ret = ""
 
         if self.scalar != 1:
-            ret += self.scalar + '*'
+            ret += str(self.scalar) + '*'
 
         for m, p in zip(self.monomial, self.power):
             if p != 1:
