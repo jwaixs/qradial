@@ -9,7 +9,18 @@ class Monomial(object):
 
     def __getitem__(self, index):
         if type(index) == slice:
-            r = range(index.start, index.stop)
+            r = None
+            if index.start and index.stop:
+                r = range(index.start, index.stop)
+            elif index.start:
+                r = range(index.start, len(self.monomial))
+            elif index.stop:
+                if index.stop >= 0:
+                    r = range(0, index.stop)
+                else:
+                    r = range(0, len(self.monomial) + index.stop)
+            else:
+                raise ValueError('No start or end given.')
             return Monomial(1, [self.monomial[i] for i in r], [self.power[i] for i in r])
         else:
             return Monomial(1, [self.monomial[index]], [self.power[index]])
