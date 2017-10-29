@@ -74,12 +74,21 @@ def step2a(m1, m2):
        and m2.monomial[1] == 'K2' and m2.power[1] == -1:
 
         if com_elm.monomial[0] == 'K':
+            # K^l * E1 * K2^{-1} |--> q^l E_1 * K_2^{-1} K^l
             scalar *= q**(com_elm.power[0]) # check this
             return scalar, None, m2, com_elm
 
         if com_elm.monomial[0] == 'F2':
-            scalar *= q**2 # check this
+            # F2 * E1 * K2^{-1} |--> q^2 E1 * K2^{-1} * F2
+            scalar *= q**(-2) # check this
             return scalar, start, m2, com_elm
+
+        if com_elm.monomial[0] == 'F1':
+            # E1 * F1 - F1 * E2 = (q - q^{-1}) * (K1 - K1^{-1})
+            # F1 * E1 * K2^{-1} |--> (E1 * F1 * K2^{-1} - (q - q^{-1}) * (K1 - K1^{-1}) * K2^{-1})
+            #   |--> (q * E1 * K2^{-1} * F1 - (q - q^{-1}) * (K1 - K1^{-1}) * K2^{-1})
+            rest = q * F1 - ((q - q^(-1))) * (K1 - K1^(-1)) * K2^(-1)
+            return scalar, start[:-1], com_elm, rest
 
     if m2.monomial[0] == 'E2' and m2.power[0] == 1 \
        and m2.monomial[1] == 'K1' and m2.power[1] == -1:
@@ -96,6 +105,7 @@ scalar, first, main, rest = step2a(Kl*F2, E1*K2inv)
 print(scalar, first, main, rest)
 scalar, first, main, rest = step2a(first, main)
 print(scalar, first, main, rest)
+print(step2a(Kl*F1, E1*K2inv))
 
 def step2(P):
     ret = None
