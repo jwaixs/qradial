@@ -67,7 +67,6 @@ def step2a(m1, m2):
     # Output: (s, n1, n2, n3) |--> s*n1*n2*n3
 
     scalar = m1.scalar
-    print(m1, m1[:-1])
     start = None if len(m1.monomial) == 1 else m1[:-1]
     com_elm = m1[-1]
 
@@ -93,7 +92,10 @@ def step2a(m1, m2):
 
 X = Kl * F2 * E1 * K2inv
 print(X)
-print(step2a(Kl*F2, E1*K2inv))
+scalar, first, main, rest = step2a(Kl*F2, E1*K2inv)
+print(scalar, first, main, rest)
+scalar, first, main, rest = step2a(first, main)
+print(scalar, first, main, rest)
 
 def step2(P):
     ret = None
