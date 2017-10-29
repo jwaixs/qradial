@@ -1,5 +1,7 @@
 from que import Monomial, Polynomial
 
+print('=== Start q-cm.sage ===')
+
 q = var('q')
 
 E1 = Monomial(1, ['E1'])
@@ -28,10 +30,7 @@ B1d = Monomial(1, ['B1d'])
 B2d = Monomial(1, ['B2d'])
 
 Kl = Monomial(1, ['K'], [l])
-print(Kl)
 X = Polynomial([Kl*F1])
-
-print(X)
 
 def step1(P):
     '''Replace the last Fi with Bid + ci * Ej*Kiinv.'''
@@ -59,6 +58,43 @@ def step1(P):
 
     return ret
 
+def step2a(m1, m2):
+    # Apply commutation relations:
+    # Input: (K^l F_{i_1} ... F_{i_n}, E_j K_j^{-1})
+    # Output: (scalar, K^l F_{i_1} ... F_{i_{n-1}}, E_j K_j^{-1}, F_{i_n} + rest)
+
+    # Input: (m1, m2) |--> m1*m2
+    # Output: (s, n1, n2, n3) |--> s*n1*n2*n3
+
+    scalar = m1.scalar
+    print(m1, m1[:-1])
+    start = None if len(m1.monomial) == 1 else m1[:-1]
+    com_elm = m1[-1]
+
+    if m2.monomial[0] == 'E1' and m2.power[0] == 1 \
+       and m2.monomial[1] == 'K2' and m2.power[1] == -1:
+
+        if com_elm.monomial[0] == 'K':
+            scalar *= q**(com_elm.power[0]) # check this
+            return scalar, None, m2, com_elm
+
+        if com_elm.monomial[0] == 'F2':
+            scalar *= q**2 # check this
+            return scalar, start, m2, com_elm
+
+    if m2.monomial[0] == 'E2' and m2.power[0] == 1 \
+       and m2.monomial[1] == 'K1' and m2.power[1] == -1:
+
+        if com_elm.monomial[0] == 'K':
+            scalar *= q**(com_elm.power[0]) # check this
+            return scalar, None, m2, com_elm
+
+    return scalar, m1, m2, None
+
+X = Kl * F2 * E1 * K2inv
+print(X)
+print(step2a(Kl*F2, E1*K2inv))
+
 def step2(P):
     ret = None
 
@@ -83,7 +119,6 @@ def step2(P):
 
                 for i in range(len(monomial)-3, -1, -1):
                     print(monomial[i])
-            
         else:
             newt = M
 
@@ -93,8 +128,8 @@ def step2(P):
             ret = newt
 
     return ret
- 
-S1 = step1(X)
-print(S1)
-S2 = step2(S1)
+
+#S1 = step1(X)
+#print(S1)
+#S2 = step2(S1)
 #print(S2)
