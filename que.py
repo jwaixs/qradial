@@ -43,6 +43,9 @@ class Monomial(object):
     def __add__(self, other):
         return Polynomial([self, other])
 
+    def __sub__(self, other):
+        return Polynomial([self, -1 * other])
+
     def __pow__(self, power):
         return Monomial(self.scalar, self.monomial, [power * p for p in self.power])
 
