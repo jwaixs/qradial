@@ -7,6 +7,13 @@ class Monomial(object):
         else:
             self.power = len(monomial)*[1]
 
+    def __getitem__(self, index):
+        if type(index) == slice:
+            r = range(index.start, index.stop)
+            return Monomial(1, [self.monomial[i] for i in r], [self.power[i] for i in r])
+        else:
+            return Monomial(1, [self.monomial[index]], [self.power[index]])
+
     def __mul__(self, other):
         if type(other) in (int, float):
             return Monomial(other * self.scalar, self.monomial, self.power)
@@ -171,3 +178,5 @@ K2 = Monomial(1, ['K2'])
 X = E1**2*E2*E2
 print(X)
 print(X.simplify())
+
+print(X[0], X[1], X[0:2])
