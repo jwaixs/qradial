@@ -103,15 +103,31 @@ class Polynomial(object):
         if type(other) in (float, int):
             return Polynomial(map(lambda x : other*x, self.monomials))
         elif type(other) == Polynomial:
-            return Polynomial([m*n for m in self.monomials for n in other.monomials])
+            ret = list()
+            for m in self.monomials:
+                for n in other.monomials:
+                    if type(m) == Monomial and type(n) == Monomial:
+                        ret.append(m*n)
+                    elif type(m) == Monomial and type(n) == Polynomial:
+                        ret.append(Polynomial([m]) * n)
+                    elif type(m) == Polynomial and type(n) == Monomial:
+                        ret.append(m * Polynomial([n]))
+            return Polynomial(ret)
+        elif type(other) == Monomial:
+            return Polynomial([m*Polynomial([other]) for m in self.monomials])
         else:
-            raise TypeError('Cannot multiply this type.')
+            return Polynomial(map(lambda x : other*x, self.monomials))
+            #raise TypeError('Cannot multiply this type. {} vs {}'.format(
+            #    type(self), type(other)))
 
     def __rmul__(self, other):
         if type(other) in (float, int):
             return Polynomial(map(lambda x : other*x, self.monomials))
         else:
-            raise TypeError('Cannot multiply this type.')
+            try:
+                return Polynomial(map(lambda x : other*x, self.monomials))
+            except:
+                raise TypeError('Cannot multiply this type.')
 
     def __str__(self):
         if len(self.monomials) > 1:
