@@ -29,8 +29,9 @@ B2c = Monomial(1, ['B2c'])
 B1d = Monomial(1, ['B1d'])
 B2d = Monomial(1, ['B2d'])
 
-Kl = Monomial(1, ['K'], [l])
-X = Polynomial([Kl*F1])
+A = Monomial(1, ['A'])
+
+Al = Monomial(1, ['A'], [l])
 
 def step1(P):
     '''Replace the last Fi with Bid + ci * Ej*Kiinv.'''
@@ -38,16 +39,17 @@ def step1(P):
 
     for M in P:
         scalar = M.scalar
+        power = M.power
         start = M.monomial[:-1]
         end = M.monomial[-1]
 
         newt = None
         if end == 'F1':
             # F1 = B1d + c1 * E2*K1inv
-            newt = Monomial(scalar, start) * (B1d + c1 * E2*K1inv)
+            newt = Monomial(scalar, start, power[:-1]) * (B1d + c1 * E2*K1inv)
         elif end == 'F2':
             # F2 = B2d + c2 * E1*K2inv
-            newt = Monomial(scalar, start) * (B2d + c2 * E1*K1inv)
+            newt = Monomial(scalar, start, power[:-1]) * (B2d + c2 * E1*K1inv)
         else:
             newt = P
 
@@ -58,90 +60,110 @@ def step1(P):
 
     return ret
 
-def step2a(m1, m2):
-    # Apply commutation relations:
-    # Input: (K^l F_{i_1} ... F_{i_n}, E_j K_j^{-1})
-    # Output: (scalar, K^l F_{i_1} ... F_{i_{n-1}}, E_j K_j^{-1}, F_{i_n} + rest)
+test1 = Polynomial([Al*F1])
+print('Test 1: {}'.format(str(test1)))
+t1s1 = step1(test1)
+print('Step 1: {}'.format(str(t1s1)))
 
-    # Input: (m1, m2) |--> m1*m2
-    # Output: (s, n1, n2, n3) |--> s*n1*n2*n3
+print('')
 
-    scalar = m1.scalar
-    start = None if len(m1.monomial) == 1 else m1[:-1]
-    com_elm = m1[-1]
+test2 = Polynomial([Al*F1*F2])
+print('Test 2: {}'.format(str(test2)))
+t2s1 = step1(test2)
+print('Step 1: {}'.format(str(t2s1)))
 
-    if m2.monomial[0] == 'E1' and m2.power[0] == 1 \
-       and m2.monomial[1] == 'K2' and m2.power[1] == -1:
+def step2a(FI, Ek):
+    if len(FI.monomial) == 0:
+        return Ek
 
-        if com_elm.monomial[0] == 'K':
-            # K^l * E1 * K2^{-1} |--> q^l E_1 * K_2^{-1} K^l
-            scalar *= q**(com_elm.power[0]) # check this
-            return scalar, None, m2, com_elm
+    F_last = FI[-1]
+    F_rest = FI[:-1]
 
-        if com_elm.monomial[0] == 'F2':
-            # F2 * E1 * K2^{-1} |--> q^2 E1 * K2^{-1} * F2
-            scalar *= q**(-2) # check this
-            return scalar, start, m2, com_elm
+    if Ek.monomial[0] == 'E1':
+        Eind = 1
+    else:
+        Eind = 2
 
-        if com_elm.monomial[0] == 'F1':
-            # E1 * F1 - F1 * E2 = (q - q^{-1}) * (K1 - K1^{-1})
-            # F1 * E1 * K2^{-1} |--> (E1 * F1 * K2^{-1} - (q - q^{-1}) * (K1 - K1^{-1}) * K2^{-1})
-            #   |--> (q * E1 * K2^{-1} * F1 - (q - q^{-1}) * (K1 - K1^{-1}) * K2^{-1})
-            rest = q * F1 - ((q - q^(-1))) * (K1 - K1^(-1)) * K2^(-1)
-            return scalar, start[:-1], com_elm, rest
+    if F_last.monomial[0] == 'F1':
+        Find = 1
+    else:
+        Find = 2
 
-    if m2.monomial[0] == 'E2' and m2.power[0] == 1 \
-       and m2.monomial[1] == 'K1' and m2.power[1] == -1:
+    if Find == 1 and Eind == 1:
+        r = step2a(F_rest, Ek)
+        main = q * step2a(F_rest, Ek) * F1
+        if len(F_rest.monomial) > 0:
+            rest = 1 / (q - q**(-1)) * F_rest * A**(-1) \
+                - 1 / (q - q**(-1)) * F_rest *  K
+        else:
+            rest = 1 / (q - q**(-1)) * A**(-1) - 1 / (q - q**(-1)) * K
+        return main + rest
+    elif Find == 1 and Eind == 2:
+        return q**(-2) * step2a(F_rest, Ek) * F1
+    elif Find == 2 and Eind == 1:
+        return q**(-2) * step2a(F_rest, Ek) * F2
+    elif Find == 2 and Eind == 2:
+        main = q * step2a(F_rest, Ek) * F2
+        if len(F_rest.monomial) > 0:
+            rest = 1 / (q - q**(-1)) * F_rest * (A**(-1) - K**(-1))
+        else:
+            rest = 1 / (q - q**(-1)) * (A**(-1) - K**(-1))
+        return main + rest
 
-        if com_elm.monomial[0] == 'K':
-            scalar *= q**(com_elm.power[0]) # check this
-            return scalar, None, m2, com_elm
+#print(step2a(F1, E1*K2inv))
+print(step2a(F1*F2*F1*F2, E1*K2inv))
 
-    return scalar, m1, m2, None
+def step2b(torus, Ek):
+    power = torus.power[0]
+    return q**power * Ek * torus
 
-X = Kl * F2 * E1 * K2inv
-print(X)
-scalar, first, main, rest = step2a(Kl*F2, E1*K2inv)
-print(scalar, first, main, rest)
-scalar, first, main, rest = step2a(first, main)
-print(scalar, first, main, rest)
-print(step2a(Kl*F1, E1*K2inv))
+print(step2b(Al, E1*K2inv))
+
+def step3(P):
+    pass
+
+    
 
 def step2(P):
     ret = None
 
     for M in P:
         scalar = M.scalar
-        monomial = M.monomial
         power = M.power
 
-        newt = None
-        if len(monomial) > 2:
-            if monomial[-1] == 'K1' and power[-1] == -1 \
-                and monomial[-2] == 'E2' and power[-2] == 1:
-                # K^l F_{i_1} F_{i_2} ... F_{i_{n-1}} E_j K_j^{-1}
-                # |-->
-                # E_j K_j^{-1} K^l F_{i_1} F_{i_2} ... F_{i_{n-1}} + ...rest terms...
+        start = 0
+        end = 0
 
-                continue
-                # I dont know how to do it yet.
+        found_start = False
+        found_end = False
 
-                main = M
-                rest = None
+        for i in range(len(M.monomial)):
+            if M.monomial[i] == 'K':
+                start = i
+                found_start = True
+                break
 
-                for i in range(len(monomial)-3, -1, -1):
-                    print(monomial[i])
+        for j in range(len(M.monomial)-1, start, -1):
+            if M.monomial[j] == 'E1' or M.monomial[j] == 'E2':
+                end = j+2
+                found_end = True
+                break
+
+        if found_start and found_end:
+            if ret == None:
+                ret = scalar * M[start:end]
+            else:
+                ret += scalar * M[start:end]
         else:
-            newt = M
-
-        if ret:
-            ret += newt
-        else:
-            ret = newt
+            if ret == None:
+                ret = scalar * M
+            else:
+                ret += scalar * M
 
     return ret
 
-#S1 = step1(X)
-#print(S1)
-#S2 = step2(S1)
-#print(S2)
+#t1s2 = step2(t1s1)
+#print('Step 2: {}'.format(str(t1s2)))
+#
+#t2s2 = step2(t2s1)
+#print('Step 2: {}'.format(str(t2s2)))
