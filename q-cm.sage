@@ -179,7 +179,6 @@ def convert(torus, F_seq):
 
     return main_scalar, main_term, rest
 
-
 def std_form_A(M):
     scalar = M.scalar
     power = M.power
@@ -274,3 +273,18 @@ def std_form_K(M):
                 del monomial[i]
 
     return Monomial(scalar, monomial, power)
+
+def bab_decomposition(torus, F_seq):
+    start_seq = F_seq.monomial
+
+    scalar, main, rest = convert(torus, F_seq)
+    new_seq = main[1:]
+    while new_seq.monomial != F_seq.monomial:
+        ns, main, nr = convert(torus, new_seq)
+        new_seq = main[1:]
+        scalar *= ns
+        rest += nr
+
+    rest.flatten()
+
+    return 1 / (1 - scalar) * rest
