@@ -357,6 +357,6 @@ def bab_decomposition(torus, F_seq):
             else:
                 bab_rest += m_bab
 
-    return 1 / (1 - scalar) * bab_rest
+    return 1 / (1 - scalar) * bab_rest.flatten()
 
 
