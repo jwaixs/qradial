@@ -198,7 +198,7 @@ def std_form_A(M):
                 monomial[i-1] = t1
                 power[i-1] = p1
 
-                scalar *= q**p1
+                scalar *= q**(p1*p2)
             elif t2[0] == 'E':
                 monomial[i] = t2
                 power[i] = p2
