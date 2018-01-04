@@ -120,6 +120,8 @@ def step2a(FI, Ek):
             rest = 1 / (q - q**(-1)) * (A**(-1) - K**(-1))
         if r != 0:
             return q*s, q*r + rest
+        else:
+            return q*s, rest
 
 def step2b(torus):
     # Commutation relation A^l between E_i K_i^{-1}
