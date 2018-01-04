@@ -154,6 +154,20 @@ class Polynomial(object):
                 new_monomials.append(m)
         return Polynomial(new_monomials)
 
+    def flatten(self):
+        new_monomials = list()
+        for m in self.monomials:
+            if type(m) == Monomial:
+                new_monomials.append(m)
+            elif type(m) == Polynomial:
+                for n in m.flatten():
+                    new_monomials.append(n)
+            else:
+                raise TypeError('Cannot flatten this polynomial.')
+
+        self.monomials = new_monomials
+        return self
+
 #m = Monomial(1, ['X1'])
 #print(m)
 #print(m.monomial)
