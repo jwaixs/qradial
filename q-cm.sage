@@ -213,3 +213,62 @@ def std_form_A(M):
                 del monomial[i]
 
     return Monomial(scalar, monomial, power)
+
+def std_form_K(M):
+    scalar = M.scalar
+    power = M.power
+    monomial = M.monomial
+
+    for i in range(len(monomial)-1, 0, -1):
+        t1 = monomial[i]
+        p1 = power[i]
+
+        t2 = monomial[i-1]
+        p2 = power[i-1]
+
+        if t1 == 'K':
+            if t2 == 'F1':
+                monomial[i] = t2
+                power[i] = p2
+
+                monomial[i-1] = t1
+                power[i-1] = p1
+
+                scalar *= q**(p1*p2)
+            elif t2 == 'F2':
+                monomial[i] = t2
+                power[i] = p2
+
+                monomial[i-1] = t1
+                power[i-1] = p1
+
+                scalar *= q**(-p1*p2)
+            elif t2 == 'E1':
+                monomial[i] = t2
+                power[i] = p2
+
+                monomial[i-1] = t1
+                power[i-1] = p1
+
+                scalar *= q**(-p1*p2)
+            elif t2 == 'E2':
+                monomial[i] = t2
+                power[i] = p2
+
+                monomial[i-1] = t1
+                power[i-1] = p1
+
+                scalar *= q**(p1*p2)
+            elif t2 == 'A':
+                monomial[i] = t2
+                power[i] = p2
+
+                monomial[i-1] = t1
+                power[i-1] = p1
+
+            elif t2 == 'K':
+                power[i-1] += p1
+                del power[i]
+                del monomial[i]
+
+    return Monomial(scalar, monomial, power)
