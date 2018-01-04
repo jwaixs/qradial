@@ -176,3 +176,40 @@ def convert(torus, F_seq):
         rest += s1_scalar * s3_rest * torus * F_stable
 
     return main_scalar, main_term, rest
+
+
+def std_form_A(M):
+    scalar = M.scalar
+    power = M.power
+    monomial = M.monomial
+
+    for i in range(len(monomial)-1, 0, -1):
+        t1 = monomial[i]
+        p1 = power[i]
+
+        t2 = monomial[i-1]
+        p2 = power[i-1]
+
+        if t1 == 'A':
+            if t2[0] == 'F':
+                monomial[i] = t2
+                power[i] = p2
+
+                monomial[i-1] = t1
+                power[i-1] = p1
+
+                scalar *= q**p1
+            elif t2[0] == 'E':
+                monomial[i] = t2
+                power[i] = p2
+
+                monomial[i-1] = t1
+                power[i-1] = p1
+
+                scalar *= q**(-p1)
+            elif t2 == 'A':
+                power[i-1] += p1
+                del power[i]
+                del monomial[i]
+
+    return Monomial(scalar, monomial, power)
