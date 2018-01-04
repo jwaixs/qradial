@@ -274,9 +274,47 @@ def std_form_K(M):
 
     return Monomial(scalar, monomial, power)
 
+def split_monomial(m):
+    # Split monomial in B, A, FI, B parts
+    scalar = m.scalar
+    try:
+        a_index = m.monomial.index('A')
+    except ValueError:
+        return None
+
+    # No FI part
+    if a_index == len(m.monomial) - 1:
+        return None
+
+    if m.monomial[a_index+1][0] != 'F':
+        return None
+
+    f_start = a_index + 1
+    f_stop = f_start
+    while f_stop <= len(m.monomial) - 1 and m.monomial[f_stop][0] == 'F':
+        f_stop += 1
+
+    left_B_part = None
+    if a_index > 0:
+        left_B_part = m[:a_index]
+
+    torus = m[a_index]
+
+    FI = m[f_start:f_stop]
+
+    right_B_part = None
+    if f_stop < len(m.monomial):
+        right_B_part = m[f_stop:]
+
+    return scalar, left_B_part, torus, FI, right_B_part
+
 def bab_decomposition(torus, F_seq):
+    if len(F_seq.monomial) == 0:
+        return torus
+
     start_seq = F_seq.monomial
 
+    # Apply convert step until first occurence of same sequence.
     scalar, main, rest = convert(torus, F_seq)
     new_seq = main[1:]
     while new_seq.monomial != F_seq.monomial:
@@ -285,6 +323,40 @@ def bab_decomposition(torus, F_seq):
         scalar *= ns
         rest += nr
 
-    rest.flatten()
+    # Bring rest term into standard form
+    std_rest = None
 
-    return 1 / (1 - scalar) * rest
+    for m in rest.flatten():
+        std_m = std_form_A(std_form_K(m))
+        if std_rest == None:
+            std_rest = std_m
+        else:
+            std_rest += std_m
+
+    # Apply bab decomposition to lower rest terms
+    bab_rest = None
+
+    for m in std_rest:
+        split = split_monomial(m)
+        if split == None:
+            if bab_rest == None:
+                bab_rest = m
+            else:
+                bab_rest += m
+        else:
+            s, left_B, torus, FI, right_B = split
+            m_bab = s * bab_decomposition(torus, FI)
+
+            if left_B != None:
+                m_bab = left_B * m_bab
+            if right_B != None:
+                m_bab = m_bab * right_B
+
+            if bab_rest == None:
+                bab_rest = m_bab
+            else:
+                bab_rest += m_bab
+
+    return 1 / (1 - scalar) * bab_rest
+
+
