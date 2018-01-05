@@ -144,9 +144,13 @@ class Polynomial(object):
         new_monomials = list()
         for m in self.monomials:
             m = m.simplify()
+
+            if m.scalar == 0:
+                continue
+
             new_monomial = True
             for i, n in enumerate(new_monomials):
-                if m.monomial == n.monomial:
+                if m.monomial == n.monomial and m.power == n.power:
                     new_monomials[i].scalar += m.scalar
                     new_monomial = False
                     continue
