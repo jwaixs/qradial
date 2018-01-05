@@ -42,44 +42,6 @@ def step1(Fk):
 
 def step2a(FI, Ek):
     if len(FI.monomial) == 0:
-        return Ek
-
-    F_last = FI[-1]
-    F_rest = FI[:-1]
-
-    if Ek.monomial[0] == 'E1':
-        Eind = 1
-    else:
-        Eind = 2
-
-    if F_last.monomial[0] == 'F1':
-        Find = 1
-    else:
-        Find = 2
-
-    if Find == 1 and Eind == 1:
-        r = step2a(F_rest, Ek)
-        main = q * step2a(F_rest, Ek) * F1
-        if len(F_rest.monomial) > 0:
-            rest = 1 / (q - q**(-1)) * F_rest * A**(-1) \
-                - 1 / (q - q**(-1)) * F_rest *  K
-        else:
-            rest = 1 / (q - q**(-1)) * A**(-1) - 1 / (q - q**(-1)) * K
-        return main + rest
-    elif Find == 1 and Eind == 2:
-        return q**(-2) * step2a(F_rest, Ek) * F1
-    elif Find == 2 and Eind == 1:
-        return q**(-2) * step2a(F_rest, Ek) * F2
-    elif Find == 2 and Eind == 2:
-        main = q * step2a(F_rest, Ek) * F2
-        if len(F_rest.monomial) > 0:
-            rest = 1 / (q - q**(-1)) * F_rest * (A**(-1) - K**(-1))
-        else:
-            rest = 1 / (q - q**(-1)) * (A**(-1) - K**(-1))
-        return main + rest
-
-def step2a(FI, Ek):
-    if len(FI.monomial) == 0:
         return 1, 0
 
     F_last = FI[-1]
