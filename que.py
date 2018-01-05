@@ -71,6 +71,10 @@ class Monomial(object):
             scalar = self.scalar.simplify()
         except AttributeError:
             scalar = self.scalar
+        try:
+            scalar = self.scalar.factor()
+        except:
+            scalar = self.scalar
         monomial = list()
         power = list()
 
