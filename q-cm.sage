@@ -129,9 +129,9 @@ def step2b(torus):
 
 def step3(Ek):
     if Ek.monomial[0] == 'E1':
-        return 1/c2, F2, 1/c2 * B2c
+        return 1/c2, F2, -1/c2 * B2c
     elif Ek.monomial[0] == 'E2':
-        return 1/c1, F1, 1/c1 * B1c
+        return 1/c1, F1, -1/c1 * B1c
 
 def step4(torus):
     return q**(torus.power[0])
@@ -174,8 +174,8 @@ def convert(torus, F_seq):
     rest = torus * F_stable * s1_B
     if s2a_rest != 0:
         rest += s1_scalar * torus * s2a_rest
-    if s3_rest != 0:
-        rest += s1_scalar * s3_rest * torus * F_stable
+    if s2b_scalar != 0 and s3_rest != 0:
+        rest += s1_scalar * s2a_scalar * s2b_scalar * s3_rest * torus * F_stable
 
     return main_scalar, main_term, rest
 
@@ -320,8 +320,8 @@ def bab_decomposition(torus, F_seq):
     while new_seq.monomial != F_seq.monomial:
         ns, main, nr = convert(torus, new_seq)
         new_seq = main[1:]
+        rest += scalar * nr
         scalar *= ns
-        rest += nr
 
     # Bring rest term into standard form
     std_rest = None
@@ -336,7 +336,7 @@ def bab_decomposition(torus, F_seq):
     # Apply bab decomposition to lower rest terms
     bab_rest = None
 
-    for m in std_rest:
+    for m in std_rest.flatten():
         split = split_monomial(m)
         if split == None:
             if bab_rest == None:
