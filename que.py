@@ -25,6 +25,9 @@ class Monomial(object):
         else:
             return Monomial(1, [self.monomial[index]], [self.power[index]])
 
+    def __len__(self):
+        return len(self.monomial)
+
     def __mul__(self, other):
         if type(other) in (int, float):
             return Monomial(other * self.scalar, self.monomial, self.power)
@@ -101,7 +104,15 @@ class Polynomial(object):
         if type(other) == Polynomial:
             return Polynomial(self.monomials + other.monomials)
         else:
-            raise TypeError('Cannot add object this type.')
+            raise TypeError('Cannot add object of this type {}.'.format(type(other)))
+
+    def __sub__(self, other):
+        if type(other) == Monomial:
+            return Polynomial(self.monomials + [other])
+        if type(other) == Polynomial:
+            return Polynomial(self.monomials + other.monomials)
+        else:
+            raise TypeError('Cannot add object of this type {}.'.format(type(other)))
 
     def __mul__(self, other):
         if type(other) in (float, int):
