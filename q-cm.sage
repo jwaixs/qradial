@@ -321,4 +321,22 @@ def bab_decomposition(torus, F_seq):
 
     return 1 / (1 - scalar) * bab_rest.flatten()
 
-
+def compare(a, b):
+    if type(a) == Polynomial and type(b) == Polynomial:
+        for m1 in a:
+            equal = False
+            for m2 in b:
+                if compare(m1, m2):
+                    equal = True
+                    continue
+            if not equal:
+                return False
+        return True
+    elif type(a) == Monomial and type(b) == Monomial:
+        if a.monomial == b.monomial and a.power == b.power \
+                and a.scalar == b.scalar:
+            return True
+        else:
+            return False
+    else:
+        return False

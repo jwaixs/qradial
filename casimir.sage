@@ -76,3 +76,32 @@ def bab_decomposition_polynomial(poly):
                 ret = m
 
     return ret
+
+def apply_trivial_rep(bab_poly):
+    ret = None
+
+    for m in bab_poly.monomials:
+        if 'B1c' in m.monomial or 'B2c' in m.monomial \
+                or 'B1d' in m.monomial or 'B2d' in m.monomial:
+            continue
+
+        scalar = m.scalar.substitute({c1 : q**3/c2, d1 : q**3/d2})
+        monomial = m.monomial
+        power = m.power
+
+        new_monomial = list()
+        new_power = list()
+
+        for m, p in zip(monomial, power):
+           if m == 'K':
+               continue
+           else:
+               new_monomial.append(m)
+               new_power.append(p)
+
+        if ret:
+            ret += Monomial(scalar, new_monomial, new_power)
+        else:
+            ret = Monomial(scalar, new_monomial, new_power)
+
+    return ret
