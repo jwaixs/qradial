@@ -50,7 +50,8 @@ class Monomial(object):
         return Polynomial([self, -1 * other])
 
     def __pow__(self, power):
-        return Monomial(self.scalar, self.monomial, [power * p for p in self.power])
+        return Monomial(self.scalar**power, self.monomial,
+                        [power * p for p in self.power])
 
     def __str__(self):
         ret = ""
@@ -90,9 +91,29 @@ class Monomial(object):
 
         return Monomial(scalar, monomial, power)
 
+    def present(self, repr_dict):
+        repr_monomial = None
+        for m, p in zip(self.monomial, self.power):
+            if repr_monomial:
+                repr_monomial *= repr_dict[m]**p
+            else:
+                repr_monomial = repr_dict[m]**p
+        return self.scalar * repr_monomial
+
 class Polynomial(object):
     def __init__(self, monomials):
         self.monomials = monomials
+
+    def present(self, repr_dict):
+        ret = None
+
+        for m in self.monomials:
+            if ret:
+                ret += m.present(repr_dict)
+            else:
+                ret = m.present(repr_dict)
+
+        return ret
 
     def __iter__(self):
         for M in self.monomials:
