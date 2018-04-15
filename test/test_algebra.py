@@ -33,6 +33,22 @@ def test_assign_monomial():
     assert m1.monomial == ['A']
     assert m1.power == [1]
 
+def test_str_monomial():
+    m1 = Monomial()
+
+    assert str(m1) == ''
+
+    m1.scalar = 1
+    m1.monomial = ['A']
+
+    assert str(m1) == 'A'
+
+    m1.scalar = 2
+    m1.monomial = ['A', 'B']
+    m1.power = [2, 3]
+
+    assert str(m1) == '2*A^(2)*B^(3)'
+
 
 def test_create_polynomial():
     m1 = Monomial(1, ['A'])
@@ -53,3 +69,14 @@ def test_assign_polynomial():
     p1.monomials = [Monomial()]
 
     assert len(p1.monomials) == 1
+
+def test_str_polynomial():
+    p = Polynomial()
+
+    assert str(p) == ''
+
+    m1 = Monomial(1, ['A', 'B'], [2, 3])
+    m2 = Monomial(2, ['C'])
+    p.monomials = [m1, m2]
+
+    assert str(p) == 'A^(2)*B^(3) + 2*C'

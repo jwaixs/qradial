@@ -1,7 +1,5 @@
 """Algebra module."""
 
-# pylint: disable=attribute-defined-outside-init
-
 
 class Monomial(object):
     """Monomial object."""
@@ -14,6 +12,10 @@ class Monomial(object):
             monomial (str or list): list of monomial elements.
             power (optional, list): power of each element in monomial.
         """
+        self._scalar = 1
+        self._monomial = None
+        self._power = None
+
         self.scalar = scalar
         self.monomial = monomial
         self.power = power
@@ -45,6 +47,9 @@ class Monomial(object):
                 type(value))
             raise ValueError(serr)
 
+        if not self.power or len(self.power) != len(value):
+            self.power = None
+
     @property
     def power(self):
         """Power values for monomial elements, list."""
@@ -61,6 +66,24 @@ class Monomial(object):
         else:
             self._power = len(self.monomial) * [1]
 
+    def __len__(self):
+        """Return number of monomial elements."""
+        return len(self.monomial)
+
+    def __str__(self):
+        """Return string representation of monomial."""
+        ret = ''
+        if self.scalar != 1:
+            ret = '{}*'.format(str(self.scalar))
+
+        for ind_m, ind_p in zip(self.monomial, self.power):
+            if ind_p != 1:
+                ret += '{}^({})*'.format(ind_m, ind_p)
+            else:
+                ret += '{}*'.format(ind_m)
+
+        return ret[:-1]
+
 
 class Polynomial(object):
     """Polynomial object."""
@@ -71,6 +94,8 @@ class Polynomial(object):
         Inputs:
             monomials (list of monomials)
         """
+        self._monomials = None
+
         self.monomials = monomials
 
     @property
@@ -85,3 +110,13 @@ class Polynomial(object):
         elif not isinstance(value, list):
             raise ValueError('Monomials should be list.')
         self._monomials = value
+
+    def __len__(self):
+        """Return number of monomials in polynomial."""
+        return len(self.monomials)
+
+    def __str__(self):
+        """Return string representation of polynomial."""
+        if self.monomials:
+            return ' + '.join(map(str, self.monomials))
+        return ''
