@@ -6,7 +6,12 @@ source activate qradial
 conda install pytest
 ```
 
-== For debug purpose ==
+== For development ==
 ```
 export PYTHONPATH=/path/to/qradial:${PYTHONPATH}
+```
+Code checker
+```
+conda install pycodestyle pylint
+pip install yapf mypy pydocstyle
 ```
