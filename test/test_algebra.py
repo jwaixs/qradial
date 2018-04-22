@@ -112,11 +112,9 @@ def test_create_polynomial():
 
 def test_assign_polynomial():
     p1 = Polynomial()
-
-    assert not p1.monomials
+    assert len(p1.monomials) == 1
 
     p1.monomials = [Monomial()]
-
     assert len(p1.monomials) == 1
 
 
@@ -130,3 +128,49 @@ def test_str_polynomial():
     p.monomials = [m1, m2]
 
     assert str(p) == 'A^(2)*B^(3) + 2*C'
+
+
+def test_mult_scalar_polynomial():
+    p = Polynomial()
+    s = 2
+
+    sp = s * p
+    assert isinstance(sp, Polynomial)
+
+    ps = p * s
+    assert isinstance(ps, Polynomial)
+
+    m1 = Monomial(1, ['A'])
+    m2 = Monomial(2, ['B'])
+    p2 = Polynomial([m1, m2])
+    sp2 = s * p2
+    assert isinstance(sp2, Polynomial)
+    assert str(sp2) == '2*A + 4*B'
+
+    p2s = p2 * s
+    assert isinstance(sp2, Polynomial)
+    assert str(sp2) == '2*A + 4*B'
+
+
+def test_mult_monomial_polynomial():
+    p1 = Polynomial()
+    m1 = Monomial()
+
+    m1p1 = m1 * p1
+    assert isinstance(m1p1, Polynomial)
+
+    p1m1 = p1 * m1
+    assert isinstance(p1m1, Polynomial)
+
+    m1 = Monomial(1, ['A'])
+    m2 = Monomial(2, ['B'])
+    p2 = Polynomial([m1, m2])
+    m3 = Monomial(3, ['C'])
+
+    p2m3 = p2 * m3
+    assert isinstance(p2m3, Polynomial)
+    assert str(p2m3) == '3*A*C + 6*B*C'
+
+    m3p2 = m3 * p2
+    assert isinstance(m3p2, Polynomial)
+    assert str(m3p2) == '3*C*A + 6*C*B'

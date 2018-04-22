@@ -92,6 +92,7 @@ class Monomial(object):
             return Monomial(self.scalar * other.scalar,
                             self.monomial + other.monomial,
                             self.power + other.power)
+        return NotImplemented
 
     def __rmul__(self, other):
         """Right multiplication for monomials and polynomials."""
@@ -101,6 +102,7 @@ class Monomial(object):
             return Monomial(self.scalar * other.scalar,
                             other.monomial + other.monomial,
                             other.power + self.power)
+        return NotImplemented
 
 
 class Polynomial(object):
@@ -112,9 +114,10 @@ class Polynomial(object):
         Inputs:
             monomials (list of monomials)
         """
-        self._monomials = None
+        self._monomials = [Monomial()]
 
-        self.monomials = monomials
+        if monomials:
+            self.monomials = monomials
 
     @property
     def monomials(self):
@@ -138,3 +141,19 @@ class Polynomial(object):
         if self.monomials:
             return ' + '.join(map(str, self.monomials))
         return ''
+
+    def __mul__(self, other):
+        """Left multiply polynomial with scalar, monomial, or polynomial."""
+        if isinstance(other, (float, int)):
+            return Polynomial([other * m for m in self.monomials])
+        elif isinstance(other, Monomial):
+            return Polynomial([m * other for m in self.monomials])
+        return NotImplemented
+
+    def __rmul__(self, other):
+        """Right multiply polynomial with scalar, monomial, or polynomial."""
+        if isinstance(other, (float, int)):
+            return Polynomial([other * m for m in self.monomials])
+        elif isinstance(other, Monomial):
+            return Polynomial([other * m for m in self.monomials])
+        return NotImplemented
