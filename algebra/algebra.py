@@ -148,10 +148,13 @@ class Polynomial(object):
             return Polynomial([other * m for m in self.monomials])
         elif isinstance(other, Monomial):
             return Polynomial([m * other for m in self.monomials])
+        elif isinstance(other, Polynomial):
+            return Polynomial(
+                [m1 * m2 for m1 in self.monomials for m2 in other.monomials])
         return NotImplemented
 
     def __rmul__(self, other):
-        """Right multiply polynomial with scalar, monomial, or polynomial."""
+        """Right multiply polynomial with scalar, or monomial."""
         if isinstance(other, (float, int)):
             return Polynomial([other * m for m in self.monomials])
         elif isinstance(other, Monomial):

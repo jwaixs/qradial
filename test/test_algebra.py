@@ -174,3 +174,26 @@ def test_mult_monomial_polynomial():
     m3p2 = m3 * p2
     assert isinstance(m3p2, Polynomial)
     assert str(m3p2) == '3*C*A + 6*C*B'
+
+
+def test_mult_polynomial_polynomial():
+    p1 = Polynomial()
+    p2 = Polynomial()
+
+    p1p2 = p1 * p2
+    assert isinstance(p1p2, Polynomial)
+
+    m1 = Monomial(1, ['A'])
+    m2 = Monomial(2, ['B'])
+    m3 = Monomial(3, ['C'])
+    m4 = Monomial(4, ['D'])
+    p3 = Polynomial([m1, m2])
+    p4 = Polynomial([m3, m4])
+
+    p3p4 = p3 * p4
+    assert isinstance(p3p4, Polynomial)
+    assert str(p3p4) == '3*A*C + 4*A*D + 6*B*C + 8*B*D'
+
+    p4p3 = p4 * p3
+    assert isinstance(p4p3, Polynomial)
+    assert str(p4p3) == '3*C*A + 6*C*B + 4*D*A + 8*D*B'
