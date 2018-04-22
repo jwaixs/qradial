@@ -75,6 +75,8 @@ class Monomial(object):
         ret = ''
         if self.scalar != 1:
             ret = '{}*'.format(str(self.scalar))
+        elif not self.monomial:
+            ret = '1*'
 
         for ind_m, ind_p in zip(self.monomial, self.power):
             if ind_p != 1:
@@ -102,6 +104,24 @@ class Monomial(object):
             return Monomial(self.scalar * other.scalar,
                             other.monomial + other.monomial,
                             other.power + self.power)
+        return NotImplemented
+
+    def __add__(self, other):
+        """Add overload for adding scalars and monomials."""
+        if isinstance(other, (int, float)):
+            new_mon = Monomial(other)
+            return Polynomial([self, new_mon])
+        elif isinstance(other, Monomial):
+            return Polynomial([self, other])
+        return NotImplemented
+
+    def __radd__(self, other):
+        """Right add overload for adding scalars and monomials."""
+        if isinstance(other, (int, float)):
+            new_mon = Monomial(other)
+            return Polynomial([new_mon, self])
+        elif isinstance(other, Monomial):
+            return Polynomial([other, self])
         return NotImplemented
 
 
@@ -159,4 +179,22 @@ class Polynomial(object):
             return Polynomial([other * m for m in self.monomials])
         elif isinstance(other, Monomial):
             return Polynomial([other * m for m in self.monomials])
+        return NotImplemented
+
+    def __add__(self, other):
+        """Left addition polynomial with scalar, monomial, or polynomial."""
+        if isinstance(other, (float, int)):
+            return Polynomial(self.monomials + [Monomial(other)])
+        elif isinstance(other, Monomial):
+            return Polynomial(self.monomials + [other])
+        elif isinstance(other, Polynomial):
+            return Polynomial(self.monomials + other.monomials)
+        return NotImplemented
+
+    def __radd__(self, other):
+        """Right addition polynomial with scalar, or monomial."""
+        if isinstance(other, (float, int)):
+            return Polynomial([Monomial(other)] + self.monomials)
+        elif isinstance(other, Monomial):
+            return Polynomial([other] + self.monomials)
         return NotImplemented

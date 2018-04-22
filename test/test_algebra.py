@@ -38,7 +38,7 @@ def test_assign_monomial():
 def test_str_monomial():
     m1 = Monomial()
 
-    assert str(m1) == ''
+    assert str(m1) == '1'
 
     m1.scalar = 1
     m1.monomial = ['A']
@@ -80,11 +80,11 @@ def test_mult_monomial():
 
     m1m2 = m1 * m2
     assert isinstance(m1m2, Monomial)
-    assert str(m1m2) == ''
+    assert str(m1m2) == '1'
 
     m2m1 = m2 * m1
     assert isinstance(m2m1, Monomial)
-    assert str(m2m1) == ''
+    assert str(m2m1) == '1'
 
     m3 = Monomial(2, 'A', [1])
     m4 = Monomial(3, 'B', [2])
@@ -96,6 +96,28 @@ def test_mult_monomial():
     m4m3 = m4 * m3
     assert isinstance(m4m3, Monomial)
     assert str(m4m3) == '6*B^(2)*A'
+
+
+def test_add_monomial():
+    m1 = Monomial(1)
+
+    p1 = m1 + 2
+    assert isinstance(p1, Polynomial)
+    assert str(p1) == '1 + 2'
+
+    p2 = 2 + m1
+    assert isinstance(p2, Polynomial)
+    assert str(p2) == '2 + 1'
+
+    m2 = Monomial(2, 'A')
+
+    p3 = m1 + m2
+    assert isinstance(p3, Polynomial)
+    assert str(p3) == '1 + 2*A'
+
+    p4 = m2 + m1
+    assert isinstance(p4, Polynomial)
+    assert str(p4) == '2*A + 1'
 
 
 def test_create_polynomial():
@@ -121,7 +143,7 @@ def test_assign_polynomial():
 def test_str_polynomial():
     p = Polynomial()
 
-    assert str(p) == ''
+    assert str(p) == '1'
 
     m1 = Monomial(1, ['A', 'B'], [2, 3])
     m2 = Monomial(2, ['C'])
@@ -197,3 +219,43 @@ def test_mult_polynomial_polynomial():
     p4p3 = p4 * p3
     assert isinstance(p4p3, Polynomial)
     assert str(p4p3) == '3*C*A + 6*C*B + 4*D*A + 8*D*B'
+
+
+def test_add_scalar_polynomial():
+    s1 = 2
+    p1 = Polynomial()
+
+    p2 = s1 + p1
+    assert isinstance(p2, Polynomial)
+    assert str(p2) == '2 + 1'
+
+    p3 = p1 + s1
+    assert isinstance(p3, Polynomial)
+    assert str(p3) == '1 + 2'
+
+
+def test_add_monomial_polynomial():
+    m1 = Monomial(2, 'A')
+    p1 = Polynomial()
+
+    m1p1 = m1 + p1
+    assert isinstance(m1p1, Polynomial)
+    assert str(m1p1) == '2*A + 1'
+
+    p1m1 = p1 + m1
+    assert isinstance(p1m1, Polynomial)
+    assert str(p1m1) == '1 + 2*A'
+
+
+def test_add_polynomial_polynomial():
+    m1 = Monomial(1, 'A')
+    m2 = Monomial(2, 'B')
+    m3 = Monomial(3, 'C')
+    m4 = Monomial(4, 'D')
+
+    p1 = m1 + m2
+    p2 = m3 + m4
+
+    p1p2 = p1 + p2
+    assert isinstance(p1p2, Polynomial)
+    assert str(p1p2) == 'A + 2*B + 3*C + 4*D'
