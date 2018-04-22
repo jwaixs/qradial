@@ -84,6 +84,24 @@ class Monomial(object):
 
         return ret[:-1]
 
+    def __mul__(self, other):
+        """Left multiplication for monomials and polynomials."""
+        if isinstance(other, (int, float)):
+            return Monomial(other * self.scalar, self.monomial, self.power)
+        elif isinstance(other, Monomial):
+            return Monomial(self.scalar * other.scalar,
+                            self.monomial + other.monomial,
+                            self.power + other.power)
+
+    def __rmul__(self, other):
+        """Right multiplication for monomials and polynomials."""
+        if isinstance(other, (int, float)):
+            return Monomial(other * self.scalar, self.monomial, self.power)
+        elif isinstance(other, Monomial):
+            return Monomial(self.scalar * other.scalar,
+                            other.monomial + other.monomial,
+                            other.power + self.power)
+
 
 class Polynomial(object):
     """Polynomial object."""
